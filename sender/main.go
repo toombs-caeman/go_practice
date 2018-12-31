@@ -8,29 +8,29 @@ import (
     "bytes"
     "log"
 )
-type Event struct {
-    SourceID    int
-    data        int
-}
-
 
 func main() {
     idPtr := flag.Int("id", rand.Int(), "the id of this client")
-    urlPtr := flag.String("url", "127.0.0.1:8080/", "the url to send events to")
+    urlPtr := flag.String("url", "http://127.0.0.1:80/", "the url to send events to")
+    seedPtr := flag.Int64("seed", time.Now().UTC().UnixNano(), "the seed for the random value")
     flag.Parse()
+    rand.Seed(*seedPtr)
 
     log.Println("client", *idPtr, "is up, sending traffic to", *urlPtr)
     // set the maximum waiting time (between events) to 2 seconds
     var maxWait int64 = 2000000000
     for {
-        event := Event{*idPtr, rand.Int()}
+        event := map[string]int{"id":*idPtr,"value":rand.Int()}
         out, err := json.Marshal(event)
         if err != nil {
             //TODO handle error
             log.Println("err:", err)
         } else {
             // parse address arg
-            _,_ = http.Post(*urlPtr, "application/json", bytes.NewBuffer(out))
+            _, err = http.Post(*urlPtr, "application/json", bytes.NewBuffer(out))
+            if err != nil {
+                 log.Println("err:", err)
+            }
         }
         time.Sleep(time.Duration(rand.Int63n(maxWait)))
     }

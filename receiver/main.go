@@ -9,24 +9,20 @@ import (
     "io/ioutil"
 )
 
-type Event struct {
-    SourceID    int
-    data        int
-}
-
 var events chan string
 
 func logIncomingData(writer http.ResponseWriter, r *http.Request) {
-    var event Event
+    var event map[string]int
     body, err := ioutil.ReadAll(r.Body)
     if err != nil {
         log.Println("err:", err)
     }
-    err = json.Unmarshal(body, event)
+    err = json.Unmarshal(body, &event)
     if err != nil {
         log.Println("err:", err)
+        log.Println(body)
     } else {
-        events <- fmt.Sprintf("From container %d got data: %d", event.SourceID, event.data)
+        events <- fmt.Sprintf("From container %d got data: %d", event["id"], event["value"])
     }
 }
 
@@ -54,4 +50,3 @@ func main() {
     http.HandleFunc("/", logIncomingData)
     log.Fatal(http.ListenAndServe(":80", nil))
 }
-
