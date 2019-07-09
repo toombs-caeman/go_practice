@@ -1,0 +1,29 @@
+version: '3.4'
+networks:
+  practice:
+
+x-sender: &sender
+  image: sender
+  build: ./sender
+  networks:
+    - practice
+
+services:
+  s1:
+    <<: *sender
+    command: '-id=1 -url=http://r1'
+  s2:
+    <<: *sender
+    command: '-id=2 -url=http://r1'
+  s3:
+    <<: *sender
+    command: '-id=3 -url=http://r1'
+
+  r1:
+    image: receiver
+    build: ./receiver
+    networks:
+      - practice
+    volumes:
+      - ./log/:/app/log
+

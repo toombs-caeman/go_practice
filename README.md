@@ -8,9 +8,9 @@
 5. test with 2-4 docker containers of the sender.
 
 ## Usage
-build the docker containers with `make -B`
+start with `docker-compose up`
 
-run with `./run.sh`
+view the log with `tail -f log/event.log`
 
 
 ## Data format ##
